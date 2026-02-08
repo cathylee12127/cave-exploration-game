@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="溶洞探秘互动小游戏 - 探索溶洞，学习科学知识">
+  <title>溶洞探秘 - 互动小游戏</title>
+  <link rel="stylesheet" href="/src/styles/main.css">
+</head>
+<body>
+  <!-- 游戏容器 -->
+  <div id="app">
+    <!-- 游戏主界面 -->
+    <div id="game-container" class="hidden">
+      <!-- 积分显示 -->
+      <div id="score-display" class="score-panel">
+        <span class="score-label">积分</span>
+        <span id="score-value" class="score-value">0</span>
+      </div>
+
+      <!-- 溶洞场景画布 -->
+      <canvas id="game-canvas"></canvas>
+
+      <!-- 问答弹窗 -->
+      <div id="quiz-modal" class="modal hidden">
+        <div class="modal-content quiz-content">
+          <h2 id="quiz-question" class="quiz-question"></h2>
+          <div id="quiz-options" class="quiz-options"></div>
+        </div>
+      </div>
+
+      <!-- 积分结算弹窗 -->
+      <div id="result-modal" class="modal hidden">
+        <div class="modal-content result-content">
+          <h2>探险完成！</h2>
+          <p class="final-score">您的总积分：<span id="final-score-value">0</span></p>
+          <button id="view-ranking-button" class="primary-button">查看排名</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 排名页面 -->
+    <div id="ranking-page" class="hidden">
+      <div class="ranking-container">
+        <h1>排行榜</h1>
+        <div id="ranking-list" class="ranking-list"></div>
+        <button id="restart-button" class="primary-button">重新开始</button>
+      </div>
+    </div>
+
+    <!-- 加载指示器 -->
+    <div id="loading" class="loading hidden">
+      <div class="spinner"></div>
+      <p>加载中...</p>
+    </div>
+
+    <!-- 错误提示 -->
+    <div id="error-toast" class="toast hidden"></div>
+  </div>
+
+  <!-- 主应用脚本 -->
+  <script type="module" src="/src/main.js"></script>

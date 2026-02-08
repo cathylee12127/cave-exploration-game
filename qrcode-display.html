@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>溶洞探秘 - 扫码畅玩</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
+      background: linear-gradient(135deg, #1a2332, #2d1b3d);
+      color: #d4c4a8;
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+    }
+
+    .container {
+      background: linear-gradient(135deg, rgba(45, 27, 61, 0.95), rgba(26, 42, 58, 0.95));
+      backdrop-filter: blur(10px);
+      border-radius: 24px;
+      padding: 48px;
+      max-width: 600px;
+      width: 100%;
+      box-shadow: 0 12px 48px rgba(0, 0, 0, 0.6);
+      border: 2px solid rgba(212, 196, 168, 0.3);
+      text-align: center;
+    }
+
+    h1 {
+      font-size: 36px;
+      margin-bottom: 16px;
+      color: #d4c4a8;
+      text-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
+    }
+
+    .subtitle {
+      font-size: 18px;
+      color: rgba(212, 196, 168, 0.8);
+      margin-bottom: 32px;
+    }
+
+    .qr-container {
+      background: #ffffff;
+      padding: 24px;
+      border-radius: 16px;
+      margin: 32px auto;
+      display: inline-block;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+    }
+
+    #qrcode {
+      width: 300px;
+      height: 300px;
+    }
+
+    .url-display {
+      background: rgba(90, 74, 58, 0.3);
+      border: 2px solid rgba(212, 196, 168, 0.3);
+      border-radius: 12px;
+      padding: 16px;
+      margin: 24px 0;
+      font-family: 'Courier New', monospace;
+      font-size: 16px;
+      color: #d4c4a8;
+      word-break: break-all;
+    }
+
+    .instructions {
+      text-align: left;
+      margin: 24px 0;
+      padding: 20px;
+      background: rgba(90, 74, 58, 0.2);
+      border-radius: 12px;
+      border-left: 4px solid rgba(212, 196, 168, 0.5);
+    }
+
+    .instructions h3 {
+      font-size: 20px;
+      margin-bottom: 12px;
+      color: #d4c4a8;
+    }
+
+    .instructions ol {
+      margin-left: 20px;
+    }
+
+    .instructions li {
+      margin: 8px 0;
+      line-height: 1.6;
+      color: rgba(212, 196, 168, 0.9);
+    }
+
+    .button {
+      background: linear-gradient(135deg, rgba(139, 115, 85, 0.8), rgba(90, 74, 58, 0.8));
+      color: #d4c4a8;
+      border: none;
+      border-radius: 12px;
+      padding: 16px 32px;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      margin: 8px;
+    }
+
+    .button:hover {
+      background: linear-gradient(135deg, rgba(139, 115, 85, 1), rgba(90, 74, 58, 1));
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    }
+
+    .tips {
+      margin-top: 24px;
+      padding: 16px;
+      background: rgba(74, 144, 226, 0.1);
+      border-radius: 12px;
+      border: 1px solid rgba(74, 144, 226, 0.3);
+    }
+
+    .tips h4 {
+      font-size: 16px;
+      margin-bottom: 8px;
+      color: #4a90e2;
+    }
+
+    .tips p {
+      font-size: 14px;
+      line-height: 1.6;
+      color: rgba(212, 196, 168, 0.8);
+    }
+
+    .loading {
+      font-size: 18px;
+      color: rgba(212, 196, 168, 0.6);
+      margin: 32px 0;
+    }
+
+    .error {
+      color: #ff6b6b;
+      padding: 16px;
+      background: rgba(255, 107, 107, 0.1);
+      border-radius: 12px;
+      border: 1px solid rgba(255, 107, 107, 0.3);
+      margin: 24px 0;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>📱 溶洞探秘</h1>
+    <p class="subtitle">扫码畅玩 · 探索溶洞奥秘</p>
+
+    <div class="qr-container">
+      <canvas id="qrcode"></canvas>
+    </div>
+
+    <div class="url-display" id="gameUrl">正在获取游戏地址...</div>
+
+    <div class="instructions">
+      <h3>📖 使用说明</h3>
+      <ol>
+        <li>使用手机相机或微信扫一扫对准二维码</li>
+        <li>点击弹出的链接打开游戏</li>
+        <li>输入姓名开始探秘之旅</li>
+        <li>回答12道题目,挑战高分!</li>
+      </ol>
+    </div>
+
+    <button class="button" onclick="downloadQRCode()">💾 下载二维码</button>
+    <button class="button" onclick="regenerateQRCode()">🔄 重新生成</button>
+
+    <div class="tips">
+      <h4>💡 温馨提示</h4>
+      <p>
+        • 确保手机和电脑连接同一WiFi网络<br>
+        • 如果无法访问,请检查防火墙设置<br>
+        • 可以打印二维码供多人扫描使用
+      </p>
+    </div>
+  </div>
+
+  <script>
+    let gameURL = '';
+
+    // 获取局域网IP地址
+    function getGameURL() {
+      // 使用当前页面的hostname和端口
+      const hostname = window.location.hostname;
+      const port = 5174; // 前端端口
+      
+      // 如果是localhost,提示用户
+      if (hostname === 'localhost' || hostname === '127.0.0.1') {
+        document.getElementById('gameUrl').innerHTML = `
+          <div class="error">
+            ⚠️ 当前使用localhost访问<br><br>
+            请使用局域网IP地址访问此页面,例如:<br>
+            http://192.168.x.x:5174/qrcode-display.html<br><br>
+            运行以下命令获取IP地址:<br>
+            <code>node enable-mobile-access.js</code>
+          </div>
+        `;
+        return null;
+      }
+      
+      return `http://${hostname}:${port}`;
+    }
+
+    // 生成二维码
+    function generateQRCode(url) {
+      const canvas = document.getElementById('qrcode');
+      const size = 300;
+      
+      // 使用QR Server API生成二维码
+      const encodedURL = encodeURIComponent(url);
+      const qrAPIURL = `https://api.qrserver.com/v1/create-qr-code/?size=${size}x${size}&data=${encodedURL}&color=2d1b3d&bgcolor=ffffff&margin=10`;
+      
+      const img = new Image();
+      img.crossOrigin = 'anonymous';
+      
+      img.onload = function() {
+        canvas.width = size;
+        canvas.height = size;
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(img, 0, 0, size, size);
+      };
+      
+      img.onerror = function() {
+        // 如果API失败,显示错误信息
+        const ctx = canvas.getContext('2d');
+        canvas.width = size;
+        canvas.height = size;
+        
+        ctx.fillStyle = '#ffffff';
+        ctx.fillRect(0, 0, size, size);
+        
+        ctx.fillStyle = '#2d1b3d';
+        ctx.font = 'bold 16px sans-serif';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        
+        ctx.fillText('二维码生成失败', size / 2, size / 2 - 40);
+        ctx.font = '14px sans-serif';
+        ctx.fillText('请检查网络连接', size / 2, size / 2);
+        ctx.fillText('或手动输入地址:', size / 2, size / 2 + 40);
+      };
+      
+      img.src = qrAPIURL;
+    }
+
+    // 下载二维码
+    function downloadQRCode() {
+      const canvas = document.getElementById('qrcode');
+      const dataURL = canvas.toDataURL('image/png');
+      const link = document.createElement('a');
+      link.href = dataURL;
+      link.download = 'cave-exploration-qrcode.png';
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    }
+
+    // 重新生成二维码
+    function regenerateQRCode() {
+      gameURL = getGameURL();
+      if (gameURL) {
+        document.getElementById('gameUrl').textContent = gameURL;
+        generateQRCode(gameURL);
+      }
+    }
+
+    // 页面加载时生成二维码
+    window.onload = function() {
+      gameURL = getGameURL();
+      if (gameURL) {
+        document.getElementById('gameUrl').textContent = gameURL;
+        generateQRCode(gameURL);
+      }
+    };
+  </script>
+</body>
+</html>
