@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QR Code Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            background: #1a2a3a;
+            color: #d4c4a8;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        .qr-display {
+            background: linear-gradient(135deg, rgba(45, 27, 61, 0.95), rgba(26, 42, 58, 0.95));
+            border-radius: 16px;
+            padding: 24px;
+            margin: 20px 0;
+            text-align: center;
+        }
+        canvas {
+            background: white;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+        button {
+            padding: 12px 24px;
+            font-size: 16px;
+            background: #8b7355;
+            color: #d4c4a8;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            margin: 10px;
+        }
+        button:hover {
+            background: #a08565;
+        }
+        .info {
+            background: rgba(139, 115, 85, 0.3);
+            padding: 15px;
+            border-radius: 8px;
+            margin: 10px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔍 QR Code 测试页面</h1>
+        
+        <div class="info">
+            <h3>测试说明：</h3>
+            <p>这个页面用于测试二维码生成功能是否正常工作。</p>
+            <p>当前 URL: <strong id="current-url"></strong></p>
+        </div>
+
+        <div class="qr-display">
+            <h2>📱 扫码畅玩</h2>
+            <p>使用手机扫描二维码即可开始游戏</p>
+            <canvas id="qr-canvas" width="256" height="256"></canvas>
+            <p style="font-size: 12px; opacity: 0.7;">支持微信、浏览器等扫码</p>
+            <button onclick="downloadQR()">💾 下载二维码</button>
+            <button onclick="regenerateQR()">🔄 重新生成</button>
+        </div>
+
+        <div class="info">
+            <h3>生成状态：</h3>
+            <p id="status">等待生成...</p>
+        </div>
+    </div>
+
+    <script type="module">
+        import QRCodeGenerator from './src/utils/QRCodeGenerator.js';
+
+        const generator = new QRCodeGenerator();
+        const canvas = document.getElementById('qr-canvas');
+        const statusEl = document.getElementById('status');
+        const urlEl = document.getElementById('current-url');
+
+        // 显示当前 URL
+        urlEl.textContent = window.location.href;
+
+        // 生成二维码
+        function generateQR() {
+            statusEl.textContent = '正在生成二维码...';
+            statusEl.style.color = '#fbbf24';
+
+            try {
+                const success = generator.generateToCanvas(
+                    window.location.href,
+                    canvas,
+                    {
+                        size: 256,
+                        margin: 2,
+                        colorDark: '#2d1b3d',
+                        colorLight: '#ffffff',
+                        errorCorrectionLevel: 'M'
+                    }
+                );
+
+                if (success) {
+                    statusEl.textContent = '✅ 二维码生成成功！';
+                    statusEl.style.color = '#4ade80';
+                } else {
+                    statusEl.textContent = '❌ 二维码生成失败';
+                    statusEl.style.color = '#ef4444';
+                }
+            } catch (error) {
+                statusEl.textContent = '❌ 错误: ' + error.message;
+                statusEl.style.color = '#ef4444';
+                console.error('QR Code generation error:', error);
+            }
+        }
+
+        // 下载二维码
+        window.downloadQR = function() {
+            try {
+                const dataURL = canvas.toDataURL('image/png');
+                const link = document.createElement('a');
+                link.href = dataURL;
+                link.download = 'qrcode-test.png';
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                statusEl.textContent = '✅ 二维码已下载';
+                statusEl.style.color = '#4ade80';
+            } catch (error) {
+                statusEl.textContent = '❌ 下载失败: ' + error.message;
+                statusEl.style.color = '#ef4444';
+            }
+        };
+
+        // 重新生成
+        window.regenerateQR = function() {
+            generateQR();
+        };
+
+        // 页面加载时生成
+        generateQR();
+    </script>
+</body>
+</html>

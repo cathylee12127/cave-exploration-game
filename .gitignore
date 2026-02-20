@@ -1,0 +1,41 @@
+# 依赖
+node_modules/
+backend/node_modules/
+frontend/node_modules/
+
+# 构建输出
+frontend/dist/
+backend/dist/
+
+# 数据库文件
+*.db
+*.sqlite
+*.sqlite3
+backend/database/*.db
+backend/database/*.sqlite
+
+# 环境变量
+.env
+.env.local
+.env.production
+
+# 日志
+*.log
+npm-debug.log*
+
+# 操作系统
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# 临时文件
+*.tmp
+*.temp
+
+# 二维码图片（可选，如果不想提交到 Git）
+game-qrcode-*.png

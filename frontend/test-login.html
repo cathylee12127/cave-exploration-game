@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Login Test</title>
+    <meta charset="UTF-8">
+</head>
+<body>
+    <h1>Login Test</h1>
+    <input type="text" id="username" placeholder="输入姓名" value="测试用户">
+    <button id="register">注册</button>
+    <button id="check">检查姓名</button>
+    <div id="result"></div>
+    
+    <script type="module">
+        const result = document.getElementById('result');
+        
+        // Test register
+        document.getElementById('register').addEventListener('click', async () => {
+            const username = document.getElementById('username').value;
+            result.innerHTML = '<p>Registering...</p>';
+            
+            try {
+                const response = await fetch('/api/users/register', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ username }),
+                });
+                
+                const data = await response.json();
+                result.innerHTML = `<p style="color: green;">✅ Success: ${JSON.stringify(data, null, 2)}</p>`;
+            } catch (error) {
+                result.innerHTML = `<p style="color: red;">❌ Error: ${error.message}</p>`;
+            }
+        });
+        
+        // Test check
+        document.getElementById('check').addEventListener('click', async () => {
+            const username = document.getElementById('username').value;
+            result.innerHTML = '<p>Checking...</p>';
+            
+            try {
+                const response = await fetch(`/api/users/check/${encodeURIComponent(username)}`);
+                const data = await response.json();
+                result.innerHTML = `<p style="color: green;">✅ Success: ${JSON.stringify(data, null, 2)}</p>`;
+            } catch (error) {
+                result.innerHTML = `<p style="color: red;">❌ Error: ${error.message}</p>`;
+            }
+        });
+    </script>
+</body>
+</html>

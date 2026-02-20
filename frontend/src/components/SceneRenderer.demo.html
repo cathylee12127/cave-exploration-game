@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SceneRenderer Demo - 溶洞场景渲染器演示</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Microsoft YaHei', sans-serif;
+      overflow: hidden;
+      background: #000;
+    }
+
+    #demo-canvas {
+      display: block;
+      width: 100vw;
+      height: 100vh;
+    }
+
+    .controls {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      background: rgba(0, 0, 0, 0.7);
+      padding: 20px;
+      border-radius: 10px;
+      color: #fff;
+      max-width: 300px;
+      backdrop-filter: blur(10px);
+    }
+
+    .controls h2 {
+      margin-bottom: 15px;
+      font-size: 18px;
+      color: #d4c4a8;
+    }
+
+    .controls button {
+      display: block;
+      width: 100%;
+      padding: 10px;
+      margin: 10px 0;
+      background: #3d2a4d;
+      color: #fff;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 14px;
+      transition: background 0.3s;
+    }
+
+    .controls button:hover {
+      background: #4d3a5d;
+    }
+
+    .controls button:active {
+      background: #2d1a3d;
+    }
+
+    .info {
+      margin-top: 15px;
+      padding-top: 15px;
+      border-top: 1px solid rgba(255, 255, 255, 0.2);
+      font-size: 12px;
+      line-height: 1.6;
+      color: #ccc;
+    }
+
+    .info p {
+      margin: 5px 0;
+    }
+
+    .status {
+      position: fixed;
+      bottom: 20px;
+      left: 20px;
+      background: rgba(0, 0, 0, 0.7);
+      padding: 15px 20px;
+      border-radius: 10px;
+      color: #d4c4a8;
+      backdrop-filter: blur(10px);
+      font-size: 14px;
+    }
+  </style>
+</head>
+<body>
+  <canvas id="demo-canvas"></canvas>
+
+  <div class="controls">
+    <h2>🎮 场景控制</h2>
+    <button id="btn-render">重新渲染场景</button>
+    <button id="btn-add-point">添加交互点</button>
+    <button id="btn-hover-point">模拟悬停效果</button>
+    <button id="btn-complete-point">标记为已完成</button>
+    <button id="btn-reset">重置所有交互点</button>
+
+    <div class="info">
+      <p><strong>功能特性:</strong></p>
+      <p>✅ 深蓝暗紫色调背景</p>
+      <p>✅ 钟乳石垂坠效果</p>
+      <p>✅ 石笋底部粗壮</p>
+      <p>✅ 石柱自然衔接</p>
+      <p>✅ 光影渐变效果</p>
+      <p>✅ 交互点状态变化</p>
+    </div>
+  </div>
+
+  <div class="status">
+    <span id="status-text">场景渲染器已就绪</span>
+  </div>
+
+  <script type="module">
+    // 导入 SceneRenderer
+    import { SceneRenderer } from './SceneRenderer.js';
+
+    // 获取元素
+    const canvas = document.getElementById('demo-canvas');
+    const statusText = document.getElementById('status-text');
+
+    // 创建渲染器实例
+    const renderer = new SceneRenderer();
+
+    // 初始化渲染器
+    renderer.initialize(canvas);
+    renderer.render();
+
+    // 更新状态
+    function updateStatus(message) {
+      statusText.textContent = message;
+      console.log(message);
+    }
+
+    updateStatus('✅ 场景渲染完成');
+
+    // 添加初始交互点
+    const initialPoints = [
+      { id: 'p1', x: 0.2, y: 0.3, state: 'active', questionId: 'q1' },
+      { id: 'p2', x: 0.4, y: 0.5, state: 'active', questionId: 'q2' },
+      { id: 'p3', x: 0.6, y: 0.4, state: 'active', questionId: 'q3' },
+      { id: 'p4', x: 0.8, y: 0.6, state: 'active', questionId: 'q4' },
+    ];
+
+    initialPoints.forEach(point => {
+      renderer.addInteractionPoint(point);
+    });
+
+    updateStatus(`✅ 已添加 ${initialPoints.length} 个交互点`);
+
+    // 按钮事件处理
+    document.getElementById('btn-render').addEventListener('click', () => {
+      renderer.render();
+      updateStatus('🎨 场景已重新渲染');
+    });
+
+    document.getElementById('btn-add-point').addEventListener('click', () => {
+      const newPoint = {
+        id: `p${Date.now()}`,
+        x: Math.random() * 0.8 + 0.1,
+        y: Math.random() * 0.8 + 0.1,
+        state: 'active',
+        questionId: `q${Date.now()}`
+      };
+
+      renderer.addInteractionPoint(newPoint);
+      updateStatus(`➕ 添加新交互点: (${(newPoint.x * 100).toFixed(0)}%, ${(newPoint.y * 100).toFixed(0)}%)`);
+    });
+
+    document.getElementById('btn-hover-point').addEventListener('click', () => {
+      if (renderer.interactionPoints.length > 0) {
+        const randomPoint = renderer.interactionPoints[
+          Math.floor(Math.random() * renderer.interactionPoints.length)
+        ];
+        renderer.updateInteractionPoint(randomPoint.id, 'hover');
+        updateStatus(`👆 交互点 ${randomPoint.id} 进入悬停状态`);
+      } else {
+        updateStatus('⚠️ 没有可用的交互点');
+      }
+    });
+
+    document.getElementById('btn-complete-point').addEventListener('click', () => {
+      if (renderer.interactionPoints.length > 0) {
+        const randomPoint = renderer.interactionPoints[
+          Math.floor(Math.random() * renderer.interactionPoints.length)
+        ];
+        renderer.updateInteractionPoint(randomPoint.id, 'completed');
+        updateStatus(`✅ 交互点 ${randomPoint.id} 已标记为完成`);
+      } else {
+        updateStatus('⚠️ 没有可用的交互点');
+      }
+    });
+
+    document.getElementById('btn-reset').addEventListener('click', () => {
+      renderer.interactionPoints.forEach(point => {
+        renderer.updateInteractionPoint(point.id, 'active');
+      });
+      updateStatus('🔄 所有交互点已重置为活跃状态');
+    });
+
+    // 监听窗口大小变化
+    window.addEventListener('resize', () => {
+      renderer.handleResize();
+      updateStatus('📐 画布尺寸已调整');
+    });
+
+    // 监听鼠标移动（模拟交互点悬停）
+    canvas.addEventListener('mousemove', (e) => {
+      const rect = canvas.getBoundingClientRect();
+      const x = (e.clientX - rect.left) / rect.width;
+      const y = (e.clientY - rect.top) / rect.height;
+
+      // 检测是否悬停在交互点上
+      let hoveredPoint = null;
+      renderer.interactionPoints.forEach(point => {
+        const distance = Math.sqrt(
+          Math.pow((point.x - x) * canvas.width, 2) +
+          Math.pow((point.y - y) * canvas.height, 2)
+        );
+
+        if (distance < 20) {
+          hoveredPoint = point;
+        }
+      });
+
+      // 更新所有交互点状态
+      renderer.interactionPoints.forEach(point => {
+        if (point.state !== 'completed') {
+          if (point === hoveredPoint) {
+            if (point.state !== 'hover') {
+              renderer.updateInteractionPoint(point.id, 'hover');
+            }
+          } else {
+            if (point.state === 'hover') {
+              renderer.updateInteractionPoint(point.id, 'active');
+            }
+          }
+        }
+      });
+    });
+
+    // 监听点击事件
+    canvas.addEventListener('click', (e) => {
+      const rect = canvas.getBoundingClientRect();
+      const x = (e.clientX - rect.left) / rect.width;
+      const y = (e.clientY - rect.top) / rect.height;
+
+      // 检测点击的交互点
+      renderer.interactionPoints.forEach(point => {
+        const distance = Math.sqrt(
+          Math.pow((point.x - x) * canvas.width, 2) +
+          Math.pow((point.y - y) * canvas.height, 2)
+        );
+
+        if (distance < 20) {
+          if (point.state === 'completed') {
+            renderer.updateInteractionPoint(point.id, 'active');
+            updateStatus(`🔄 交互点 ${point.id} 已重新激活`);
+          } else {
+            renderer.updateInteractionPoint(point.id, 'completed');
+            updateStatus(`✅ 交互点 ${point.id} 已完成`);
+          }
+        }
+      });
+    });
+
+    // 清理资源
+    window.addEventListener('beforeunload', () => {
+      renderer.dispose();
+    });
+  </script>
+</body>
+</html>
